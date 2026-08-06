@@ -1,52 +1,56 @@
 # Bell State Noise Simulation
 
-This repository has the code and figures for my bachelor's project: **Bell State Fidelity under Hardware Noise: Custom Model vs IBM FakeVigoV2**. I compared two noise models to see which one hurts the Bell state more, and I used Bell Measurement Fidelity (BMF) to measure the damage.
+This project is based on my bachelor’s monograph at Nangarhar University.
 
-**Author:** Umayr Utmaan — Bachelor of Physics, Nangarhar University
+I used Qiskit Aer to compare a custom noise model with the FakeVigoV2 noise model. The aim was to see how the two models change the results of a Bell-state circuit.
 
-## Research Question
+## Bell-State Circuit
 
-Does a hand-built noise model or real IBM device calibration data cause more damage to Bell-state fidelity in simulation?
+The circuit prepares this Bell state:
 
-## What I Did
+|Φ+⟩ = (|00⟩ + |11⟩) / √2
 
-I built the Bell state |Φ+⟩ = (|00⟩ + |11⟩) / √2 and ran it through two noise models using Qiskit Aer:
+It uses a Hadamard gate on the first qubit, followed by a CNOT gate.
 
-- **Custom model** — I built this myself using T1 = 30 µs, T2 = 50 µs, gate errors on H (8.1%) and CX (15.1%), and readout errors. I based the numbers on typical IBM superconducting qubit specs.
-- **FakeVigoV2 model** — this one pulls real calibration data from IBM's FakeVigo backend using `NoiseModel.from_backend()`. It uses actual gate error rates and relaxation times from the device.
+## Noise Models
 
-I ran each model 10 times with 10,000 shots per run. BMF just counts how often you get |00⟩ or |11⟩ — it's not true fidelity (you'd need quantum state tomography for that), but it's a good enough proxy for this project.
+I tested the circuit with two noise models:
+
+- **Custom model:** uses T1, T2, depolarizing noise, and readout errors.
+- **FakeVigoV2 model:** uses saved information from the FakeVigoV2 backend.
+
+FakeVigoV2 is not a live IBM quantum computer. It is a fake backend made from saved device information.
+
+## Simulation
+
+I ran each model 10 times with 10,000 shots in every run.
+
+In my monograph, I used this value:
+
+P(00) + P(11)
+
+I called it Bell Measurement Fidelity, or BMF. It shows how often the circuit gives the expected |00⟩ and |11⟩ outcomes.
+
+This value is not full quantum-state fidelity because it only checks the measurement results in the computational basis.
 
 ## Results
 
-| Model | Mean BMF | Std Dev | Mean Error Rate |
-|---|---|---|---|
-| Custom (hand-built) | ~0.8040 | ±0.0034 | ~0.1960 |
-| FakeVigoV2 (IBM) | ~0.9018 | ±0.0030 | ~0.0982 |
-| Difference (Custom − FakeVigo) | −0.0977 | — | — |
+| Model | P(00) + P(11) | Standard Deviation | P(01) + P(10) |
+|---|---:|---:|---:|
+| Custom model | 0.8040 | ±0.0034 | 0.1960 |
+| FakeVigoV2 model | 0.9018 | ±0.0030 | 0.0982 |
 
-The FakeVigo model does better because IBM's real calibration numbers are lower than the conservative estimates I used in my custom model.
+In this simulation, the FakeVigoV2 model gave more |00⟩ and |11⟩ results than the custom model.
 
 ## Figure
 
-### Bell State BMF Analysis
+![Simulation results](figures/Bell_state_bmf_analysis.png)
 
-![Bell State BMF Analysis](https://raw.githubusercontent.com/Umayrutmaan/Hardware-Aware-Bell-State-Transpilation/main/figures/Bell_state_bmf_analysis.png)
+The figure compares the results of both noise models.
 
-The figure has 4 panels:
+## Run the Code
 
-1. **Mean BMF ± 1σ** — bar chart for both models, with ideal BMF = 1.0 as reference
-2. **Mean Error Rate** — bar chart showing 1 − BMF for each model
-3. **Per-run scatter** — all 10 individual BMF values with mean and ±1σ lines
-4. **Outcome distribution** — probability of each result from the last run
+Install the required packages:
 
-## Files
-
-```text
-.
-├── README.md
-├── requirements.txt
-├── LICENSE
-├── bell_state_analysis.py
-└── figures/
-    └── Bell_state_bmf_analysis.png
+```bash
+pip install -r requirements.txt
