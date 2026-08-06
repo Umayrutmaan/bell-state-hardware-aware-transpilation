@@ -54,3 +54,12 @@ Install the required packages:
 
 ```bash
 pip install -r requirements.txt
+```
+
+Run the program:
+
+```bash
+python bell_state_analysis.py
+```
+
+For Google Colab, see [HOW_TO_RUN.md](HOW_TO_RUN.md).
